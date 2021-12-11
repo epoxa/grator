@@ -38,4 +38,9 @@ class UserObject implements User
         $this->username = $userName;
         return $this;
     }
+
+    function getCurrentGame(): ?Game
+    {
+        return null;
+    }
 }

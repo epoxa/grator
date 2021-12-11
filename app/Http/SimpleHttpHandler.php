@@ -6,7 +6,6 @@ use App\Model\User;
 use App\Model\UserObject;
 use App\Service\ServiceLocator;
 use App\Service\Services;
-use Monolog\Logger;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -47,6 +46,9 @@ class SimpleHttpHandler implements HttpHandler
 
     private function processRequest(ServerRequestInterface $request): array
     {
+//        if ($request->getMethod() === 'GET' && $request->getUri()->getPath() === '/') {
+//
+//        };
         return [];
     }
 

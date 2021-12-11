@@ -19,6 +19,7 @@ class Services implements ServiceLocator
     {
         return [
             'APP_NAME' => static::APP_NAME,
+            'BONUS_COEFFICIENT' => 3.0,
             'DEBUG' => true,
         ];
     }

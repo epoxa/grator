@@ -34,8 +34,8 @@ final class HttpTest extends TestCase{
     {
         parent::setUpBeforeClass();
         self::$services = new Services();
-        $resetCommend = new DebugResetCommand();
-        $resetCommend->execute(self::$services);
+        $resetCommend = new DebugResetCommand(self::$services);
+        $resetCommend->execute();
     }
 
 

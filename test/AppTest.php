@@ -14,8 +14,8 @@ final class AppTest extends TestCase{
     public function testReset(): void
     {
         $services = new Services();
-        $resetCommend = new DebugResetCommand();
-        $resetCommend->execute($services);
+        $resetCommend = new DebugResetCommand($services);
+        $resetCommend->execute();
         $db = $services->getDB();
         $this->assertEquals(3, $db::count('user'));
     }
