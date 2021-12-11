@@ -1,0 +1,10 @@
+{
+    auto_https disable_redirects
+    debug
+}
+
+:80 {
+    root * /srv/web
+    php_fastcgi php:9000 {
+    }
+}
