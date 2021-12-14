@@ -4,15 +4,15 @@ namespace App\Model;
 
 use App\Service\ServiceLocator;
 use App\Service\Services;
-use JetBrains\PhpStorm\Pure;
 
-class UserObject implements User
+class UserModel implements User
 {
 
     private ?string $username = null;
+    private ?int $currentGameId = null;
 
     public function __construct(
-        private ?int $id,
+        private ?int $id = null,
         private ?ServiceLocator $services = null
     )
     {
@@ -35,12 +35,16 @@ class UserObject implements User
         if (!$bean) return null;
         if (!password_verify($password, $bean['password'])) return null;
         $this->id = $bean['id'];
+        $this->currentGameId = $bean['current_game_id'];
         $this->username = $userName;
         return $this;
     }
 
     function getCurrentGame(): ?Game
     {
-        return null;
+        $db = $this->services->getDB();
+        $game = $db::findOne('game', 'id = ?', [$this->currentGameId]);
+        if (!$game) return null;
+//        return new GameModel()
     }
 }

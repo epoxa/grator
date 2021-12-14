@@ -19,7 +19,15 @@ class Services implements ServiceLocator
     {
         return [
             'APP_NAME' => static::APP_NAME,
-            'BONUS_COEFFICIENT' => 3.0,
+            'MONEY_PRIZE' => [
+                'MIN' => 1000,
+                'MAX' => 10000,
+            ],
+            'BONUS_PRIZE' => [
+                'MIN' => 1000,
+                'MAX' => 10000,
+                'COEFFICIENT' => 3.0,
+            ],
             'DEBUG' => true,
         ];
     }

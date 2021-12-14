@@ -6,7 +6,7 @@ use App\Service\ServiceLocator;
 use DateTime;
 use RedBeanPHP\RedException\SQL;
 
-class DebugResetCommand extends Method implements DebugReset
+class DebugResetCommand extends ServicesAwareMethod implements DebugReset
 {
 
     /**

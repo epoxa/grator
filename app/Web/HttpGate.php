@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http;
+namespace App\Web;
 
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
 use Nyholm\Psr7\Factory\Psr17Factory;

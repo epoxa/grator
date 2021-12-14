@@ -2,12 +2,10 @@
 
 namespace App\Method;
 
+use App\Model\Offer;
 use App\Model\User;
 
-class StatusQuery extends Method implements Status
+interface StatusQuery
 {
-    function get(User $user): array
-    {
-        return [];
-    }
+    function get(User $user): Offer;
 }

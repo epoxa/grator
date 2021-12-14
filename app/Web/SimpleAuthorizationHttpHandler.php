@@ -1,29 +1,26 @@
 <?php
 
-namespace App\Http;
+namespace App\Web;
 
 use App\Model\User;
-use App\Model\UserObject;
-use App\Service\ServiceLocator;
+use App\Model\UserModel;
 use App\Service\Services;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class SimpleHttpHandler implements HttpHandler
+class SimpleAuthorizationHttpHandler implements HttpHandler
 {
-
-    private ServiceLocator $services;
 
     public function handle(ServerRequestInterface $request, ResponseInterface $defaultResponse): ResponseInterface
     {
         if ($request->getUri()->getPath() === '/logout') {
             return $this->askForCredentials($defaultResponse);
         }
-        $this->services = new Services();
+        $services = new Services();
         $user = $this->authorize($request);
         if ($user) {
-            $result = $this->processRequest($request);
-            return $this->answerWithJson($result, $defaultResponse);
+            return (new UserAuthorizedHttpHandler($user, $services))
+                ->handle($request, $defaultResponse);
         } else {
             return $this->askForCredentials($defaultResponse);
         }
@@ -41,22 +38,9 @@ class SimpleHttpHandler implements HttpHandler
         $auth = $authHeaders[0];
         if (!preg_match('/^Basic\s+(.+)$/',$auth,$matches)) return null;
         list($userName, $password) = explode(':', base64_decode($matches[1]));
-        return (new UserObject(null, $this->services))->authorize($userName, $password);
+        return (new UserModel())->authorize($userName, $password);
     }
 
-    private function processRequest(ServerRequestInterface $request): array
-    {
-//        if ($request->getMethod() === 'GET' && $request->getUri()->getPath() === '/') {
-//
-//        };
-        return [];
-    }
 
-    private function answerWithJson($result, ResponseInterface $defaultResponse): ResponseInterface
-    {
-        $json = json_encode($result);
-        $defaultResponse->getBody()->write($json);
-        return $defaultResponse->withHeader('Content-Type', 'application/json');
-    }
 
 }

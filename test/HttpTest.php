@@ -1,8 +1,8 @@
 <?php
 
-use App\Http\HttpGate;
-use App\Http\HttpHandler;
-use App\Http\SimpleHttpHandler;
+use App\Web\HttpGate;
+use App\Web\HttpHandler;
+use App\Web\SimpleAuthorizationHttpHandler;
 use App\Method\DebugResetCommand;
 use App\Service\ServiceLocator;
 use App\Service\Services;
@@ -55,13 +55,13 @@ final class HttpTest extends TestCase{
     }
 
     /**
-     * @covers SimpleHttpHandler::authorize
+     * @covers SimpleAuthorizationHttpHandler::authorize
      */
     public function testAnon(): void
     {
         $request = new ServerRequest('GET', '/dummy');
         $defaultResponse = new Response();
-        $handler = new SimpleHttpHandler();
+        $handler = new SimpleAuthorizationHttpHandler();
         $response = $handler->handle($request,$defaultResponse);
         $this->assertEquals(401, $response->getStatusCode());
     }
