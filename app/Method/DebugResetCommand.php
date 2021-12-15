@@ -2,11 +2,11 @@
 
 namespace App\Method;
 
-use App\Service\ServiceLocator;
+use App\Service\Services;
 use DateTime;
 use RedBeanPHP\RedException\SQL;
 
-class DebugResetCommand extends ServicesAwareMethod implements DebugReset
+class DebugResetCommand implements DebugReset
 {
 
     /**
@@ -15,36 +15,45 @@ class DebugResetCommand extends ServicesAwareMethod implements DebugReset
      */
     function execute(): void
     {
-        $db = $this->services->getDB();
+        $db = Services::getDB();
+        $db::exec('UPDATE user SET current_game_id = NULL');
+        $this->dropConstraint('user', 'c_fk_user_current_game_id');
+        $this->dropConstraint('game', 'c_fk_game_item_id');
+        $this->dropConstraint('game', 'c_fk_game_user_id');
 
-        $db::wipeAll(true);
+        $debug = Services::getConfig()['DEBUG'];
+        $db::wipeAll($debug);
 
         // Users
 
         $sampleUsers = [
-            ['username' => 'Adel', 'password' => password_hash('1', PASSWORD_DEFAULT)],
-            ['username' => 'Bob', 'password' => password_hash('2', PASSWORD_DEFAULT)],
-            ['username' => 'Vadim', 'password' => password_hash('3', PASSWORD_DEFAULT)],
+            ['username' => 'Adel', 'password' => '1'],
+            ['username' => 'Bob', 'password' => '2'],
+            ['username' => 'Vadim', 'password' => '3'],
         ];
         foreach ($sampleUsers as $userData) {
             $userData['_type'] = 'user';
+            $userData['password'] = password_hash($userData['password'], PASSWORD_DEFAULT);
             $user = $db::dispense($userData);
             $db::store($user);
         }
-        $db::exec('ALTER TABLE user ADD UNIQUE unique_username(username)');
+        if ($debug) $db::exec('ALTER TABLE user ADD UNIQUE unique_username(username)');
 
         // Prize items
 
         $sampleItems = [
-            ['name' => 'iPhone 11 Pro', 'count' => 1],
-            ['name' => 'Sony VAIO Laptop', 'count' => 3],
-            ['name' => 'Slotegrator brand calendar', 'count' => 10],
+            ['name' => 'iPhone 11 Pro', 'count' => 1, 'hold' => 9],
+            ['name' => 'Sony VAIO Laptop', 'count' => 3, 'hold' => 9],
+            ['name' => 'Slotegrator brand calendar', 'count' => 10, 'hold' => 9],
         ];
         foreach ($sampleItems as $itemData) {
             $itemData['_type'] = 'item';
             $item = $db::dispense($itemData);
             $db::store($item);
+            $item['hold'] = 0;
+            $db::store($item);
         }
+        if ($debug) $db::exec('ALTER TABLE item ADD UNIQUE unique_name(name)');
 
         // Games
 
@@ -53,15 +62,34 @@ class DebugResetCommand extends ServicesAwareMethod implements DebugReset
         $game->finished_at = new DateTime('now');
         $game->item = $item;
         $game->user = $user;
-        $game->initial_prize_kind = 'money';
-        $game->selected_prize_kind = 'bonus';
-        $game->money = 10.0;
-        $game->bonus = 10.0;
+        $game->money = 10000;
+        $game->bonus = 10000;
+        $game->processed = false;
         $db::store($game);
         $user->current_game = $game;
         $db::store($user);
         $user->current_game = null;
         $db::store($user);
-        $db::exec('DELETE FROM game'); // $db::trash('game');
+        $db::trash('game');
+
+        // Bank
+
+        $bank = $db::dispense([
+            '_type' => 'bank',
+            'total' => 10000,
+            'hold' => 10000,
+        ]);
+        $db::store($bank);
+        $bank['hold'] = 0;
+        $db::store($bank);
+
     }
+
+    private function dropConstraint($tableName, $fkName)
+    {
+        $db = Services::getDB();
+        $constraintExists = $db::getCell("SELECT COUNT(*) FROM information_schema.table_constraints WHERE CONSTRAINT_NAME = '$fkName'");
+        if ($constraintExists) $db::exec("ALTER TABLE $tableName DROP FOREIGN KEY $fkName");
+    }
+
 }

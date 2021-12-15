@@ -4,7 +4,6 @@ namespace App\Web;
 
 use App\Model\User;
 use App\Model\UserModel;
-use App\Service\Services;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -16,10 +15,9 @@ class SimpleAuthorizationHttpHandler implements HttpHandler
         if ($request->getUri()->getPath() === '/logout') {
             return $this->askForCredentials($defaultResponse);
         }
-        $services = new Services();
         $user = $this->authorize($request);
         if ($user) {
-            return (new UserAuthorizedHttpHandler($user, $services))
+            return (new UserAuthorizedHttpHandler($user))
                 ->handle($request, $defaultResponse);
         } else {
             return $this->askForCredentials($defaultResponse);

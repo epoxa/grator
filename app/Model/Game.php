@@ -2,10 +2,12 @@
 
 namespace App\Model;
 
-use DateTime;
+use App\Localize\UITranslator;
 
 interface Game
 {
-    function getId(): int;
-    function getStatus(): Offer;
+    function getOfferText(UITranslator $translator): string;
+    function getAvailableCommands(): Iterable;
+    function accept(): void;
+    function decline(): void;
 }

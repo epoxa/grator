@@ -4,8 +4,6 @@ use App\Web\HttpGate;
 use App\Web\HttpHandler;
 use App\Web\SimpleAuthorizationHttpHandler;
 use App\Method\DebugResetCommand;
-use App\Service\ServiceLocator;
-use App\Service\Services;
 use Nyholm\Psr7\Response;
 use Nyholm\Psr7\ServerRequest;
 use PHPUnit\Framework\TestCase;
@@ -25,19 +23,15 @@ final class MockHttpHandler implements HttpHandler {
 
 final class HttpTest extends TestCase{
 
-    static ServiceLocator $services;
-
     /**
      * @throws SQL
      */
     public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
-        self::$services = new Services();
-        $resetCommend = new DebugResetCommand(self::$services);
+        $resetCommend = new DebugResetCommand();
         $resetCommend->execute();
     }
-
 
     /**
      * @covers

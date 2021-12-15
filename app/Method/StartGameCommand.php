@@ -2,9 +2,12 @@
 
 namespace App\Method;
 
+use App\Model\GameModel;
+use App\Model\GameRepository;
 use App\Model\User;
+use App\Service\Services;
 
-class StartGameCommand extends ServicesAwareMethod implements UserCommand
+class StartGameCommand implements UserCommand
 {
 
     function getCommandName(): string
@@ -12,16 +15,11 @@ class StartGameCommand extends ServicesAwareMethod implements UserCommand
         return 'start';
     }
 
-    /**
-     * @throws InvalidStateException
-     */
     function execute(User $user): void
     {
-        $this->checkGameNotStarted($user);
-        $db = $this->services->getDB();
-        $db::transaction(function () use ($user) {
-            $this->checkGameNotStarted($user); // Yes again!
-
+        Services::getDB()::transaction(function () use ($user) {
+            $this->checkGameNotStarted($user);
+            GameRepository::createNewRandomPrizeGame($user);
         });
     }
 

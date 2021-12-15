@@ -7,10 +7,10 @@ use RedBeanPHP\Facade;
 
 interface ServiceLocator
 {
-    function getConfig(): array;
+    static function getConfig(): array;
 
-    function getLog(): LoggerInterface;
+    static function getLog(): LoggerInterface;
 
-    function getDB(): Facade;
+    static function getDB(): Facade;
 
 }

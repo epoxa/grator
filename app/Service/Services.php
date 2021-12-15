@@ -15,7 +15,7 @@ class Services implements ServiceLocator
     static private ?LoggerInterface $logger = null;
     static private ?Facade $db = null;
 
-    function getConfig(): array
+    static function getConfig(): array
     {
         return [
             'APP_NAME' => static::APP_NAME,
@@ -26,13 +26,13 @@ class Services implements ServiceLocator
             'BONUS_PRIZE' => [
                 'MIN' => 1000,
                 'MAX' => 10000,
-                'COEFFICIENT' => 3.0,
+                'COEFFICIENT' => 300,
             ],
-            'DEBUG' => true,
+            'DEBUG' => false,
         ];
     }
 
-    function getLog(): LoggerInterface
+    static function getLog(): LoggerInterface
     {
         if (!static::$logger) {
             static::$logger = new Logger(static::APP_NAME);
@@ -44,7 +44,7 @@ class Services implements ServiceLocator
         return static::$logger;
     }
 
-    function getDB(): Facade
+    static function getDB(): Facade
     {
         if (!static::$db) {
             static::$db = new Facade();
@@ -53,10 +53,10 @@ class Services implements ServiceLocator
             $dbUser = getenv('DB_USERNAME');
             $dbPassword = getenv('DB_PASSWORD');
             $dsn = "mysql:host=$dbHost;dbname=$dbName";
-            $this->getLog()->log(Logger::DEBUG, $dsn);
+            static::getLog()->log(Logger::DEBUG, $dsn);
             $pdo = new \PDO($dsn,$dbUser,$dbPassword);
             $pdo->query('show tables');
-            static::$db::setup($dsn, $dbUser, $dbPassword, !$this->getConfig()['DEBUG']);
+            static::$db::setup($dsn, $dbUser, $dbPassword, !static::getConfig()['DEBUG']);
 //            static::$db::fancyDebug(true);
         }
         return static::$db;

@@ -6,50 +6,35 @@ use App\Localize\BonusPrizeDisplayTextComposer;
 use App\Localize\GameWelcomeDisplayTextComposer;
 use App\Localize\ItemPrizeDisplayTextComposer;
 use App\Localize\MoneyPrizeDisplayTextComposer;
+use App\Localize\UITranslator;
 use App\Localize\UserCommandDisplayTextComposer;
 use App\Model\Item;
+use App\Service\Services;
 
 class WebTranslator implements
-    GameWelcomeDisplayTextComposer,
-    MoneyPrizeDisplayTextComposer, BonusPrizeDisplayTextComposer, ItemPrizeDisplayTextComposer,
-    UserCommandDisplayTextComposer
+    UITranslator
 {
-
-    public function __construct(
-        private array $appConfig
-    )
-    {
-    }
-
-    const COMMAND_WEB_NAMES = [
-        'start' => 'Start Game',
-        'accept' => 'Accept This Prize',
-        'change' => 'Select Slotebonuses',
-        'reject' => 'No Thank You',
-    ];
 
     function composeWelcomeText(int $moneyBankFund, int $itemsTotalCount): string
     {
-        return "Welcome to the game! Start game to win one of the $itemsTotalCount items,"
-            . " money from $moneyBankFund $ fund, or unlimited slotebonuses!";
+        return "Welcome to the game! Start game to win one of the <em class='count'>$itemsTotalCount</em> items,"
+            . " money from <em class='money'>$moneyBankFund $</em> fund, or unlimited slotebonuses!";
     }
 
     function composeMoneyText(int $money): string
     {
-        $rate = $this->appConfig['BONUS']['COEFFICIENT'];
-        $formattedMoney = number_format($money / 100, 2, '', '');
+        $rate = Services::getConfig()['BONUS_PRIZE']['COEFFICIENT'];
+        $formattedMoney = number_format($money / 100, 2, '.', '');
         $bonus = $money * $rate;
-        $formattedBonus = number_format($bonus / 100, 2, '', '');;
         return
-            "You won $formattedMoney dollars! Congrats!"
-            . " But you can select $formattedBonus slotebonuses instead."
-            . " What do ypu choose?";
+            "You won <em class='money'>$formattedMoney</em> dollars! Congrats!<br>"
+            . " But you can select <em class='bonus'>$bonus</em> slotebonuses instead.<br>"
+            . " What is you choice?";
     }
 
     function composeBonusText(int $bonus): string
     {
-        $formatted = number_format($bonus / 100, 2, '', '');
-        return "You won $formatted slotebonuses! Incredible!";
+        return "You won <em class='bonus'>$bonus</em> slotebonuses! Incredible!";
     }
 
     function composeItemText(Item $item): string
@@ -57,11 +42,18 @@ class WebTranslator implements
         $rest = $item->fundRest();
         $itemName = $item->getName();
         if ($rest === 1) {
-            return "You won the last $itemName! You are so lucky!";
+            return "You won the last <em class='item'>$itemName</em>! You are so lucky!";
         } else {
-            return "$itemName. You won one of the $rest items! Not bad, c'mon!";
+            return "<em class='item'>$itemName</em>. You won one of the $rest items! Not bad, c'mon!";
         }
     }
+
+    private const COMMAND_WEB_NAMES = [
+        'start' => 'Start Game',
+        'accept' => 'Accept This Prize',
+        'replace' => 'Select Slotebonuses',
+        'decline' => 'No Thank You',
+    ];
 
     function composeCommandCaption(string $commandName): string
     {

@@ -22,10 +22,9 @@ class SafeHttpHandler implements HttpHandler
         try {
             return $this->decorate->handle($request, $defaultResponse);
         } catch (Throwable $exception) {
-            $services = new Services();
-            $services->getLog()->error($exception->getMessage());
+            Services::getLog()->error($exception->getMessage());
             $response = $defaultResponse->withStatus(500);
-            if ($services->getConfig()['DEBUG']) {
+            if (Services::getConfig()['DEBUG']) {
                 $response->getBody()->write('<pre>');
                 $response->getBody()->write($exception->getMessage());
                 $response->getBody()->write($exception->getTraceAsString());

@@ -6,7 +6,6 @@ use App\Method\InvalidStateException;
 use App\Method\StartGameCommand;
 use App\Method\StatusQueryCommand;
 use App\Model\User;
-use App\Service\Services;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -14,7 +13,6 @@ class UserAuthorizedHttpHandler implements HttpHandler
 {
     public function __construct(
         private User     $loggedInUser,
-        private Services $services,
     )
     {
     }
@@ -33,6 +31,9 @@ class UserAuthorizedHttpHandler implements HttpHandler
         }
     }
 
+    /**
+     * @throws InvalidStateException
+     */
     private function processRequest(ServerRequestInterface $request): array
     {
         $method = $request->getMethod();
@@ -49,8 +50,8 @@ class UserAuthorizedHttpHandler implements HttpHandler
 
     private function queryStatus(): array
     {
-        $tr = new WebTranslator($this->services->getConfig());
-        $statusQueryCommand = new StatusQueryCommand($this->services, $tr, $tr, $tr, $tr, $tr);
+        $tr = new WebTranslator();
+        $statusQueryCommand = new StatusQueryCommand($tr, $tr, $tr, $tr, $tr);
         $offer = $statusQueryCommand->get($this->loggedInUser);
         $status = [
             'text' => $offer->getText(),
@@ -69,7 +70,7 @@ class UserAuthorizedHttpHandler implements HttpHandler
 
     private function startGame(): array
     {
-        (new StartGameCommand($this->services))->execute($this->loggedInUser);
+        (new StartGameCommand())->execute($this->loggedInUser);
         return $this->queryStatus();
     }
 
