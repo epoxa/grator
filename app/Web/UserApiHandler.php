@@ -36,7 +36,6 @@ class UserApiHandler implements HttpHandler
     {
         try {
             $result = $this->processRequest($request);
-//            Services::getLog()->debug(print_r($result, true));
         } catch (InvalidStateException) {
             return $defaultResponse->withStatus(400, 'Inappropriate command');
         }
@@ -48,9 +47,6 @@ class UserApiHandler implements HttpHandler
         }
     }
 
-    /**
-     * @throws InvalidStateException
-     */
     private function processRequest(ServerRequestInterface $request): array
     {
         $method = $request->getMethod();

@@ -54,6 +54,7 @@ class MoneyPrize extends AbstractGame implements Game, ReplaceablePrize
     {
         $bonus = $this->money * Services::getConfig()['BONUS_PRIZE']['COEFFICIENT'];
         Services::getDB()::exec('UPDATE game SET money = null, bonus = ? WHERE id = ?', [$bonus, $this->bean['id']]);
+        Services::getDB()::exec('UPDATE bank SET hold = hold - ?', [$this->money]);
         $this->deactivateGame();
     }
 }
