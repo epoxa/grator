@@ -4,7 +4,7 @@ namespace App\Method;
 
 use App\Model\User;
 
-class PrizeReplaceBonusesCommand extends ServicesAwareMethod implements UserCommand
+class PrizeReplaceBonusesCommand implements UserCommand
 {
 
     function getCommandName(): string

@@ -16,7 +16,7 @@ class DebugResetCommand implements DebugReset
     function execute(): void
     {
         $db = Services::getDB();
-        $db::exec('UPDATE user SET current_game_id = NULL');
+
         $this->dropConstraint('user', 'c_fk_user_current_game_id');
         $this->dropConstraint('game', 'c_fk_game_item_id');
         $this->dropConstraint('game', 'c_fk_game_user_id');
@@ -28,7 +28,7 @@ class DebugResetCommand implements DebugReset
 
         $sampleUsers = [
             ['username' => 'Adel', 'password' => '1'],
-            ['username' => 'Bob', 'password' => '2'],
+            ['username' => 'Boris', 'password' => '2'],
             ['username' => 'Vadim', 'password' => '3'],
         ];
         foreach ($sampleUsers as $userData) {
@@ -43,7 +43,7 @@ class DebugResetCommand implements DebugReset
 
         $sampleItems = [
             ['name' => 'iPhone 11 Pro', 'count' => 1, 'hold' => 9],
-            ['name' => 'Sony VAIO Laptop', 'count' => 3, 'hold' => 9],
+            ['name' => 'Sony VAIO Laptop', 'count' => 4, 'hold' => 9],
             ['name' => 'Slotegrator brand calendar', 'count' => 10, 'hold' => 9],
         ];
         foreach ($sampleItems as $itemData) {
@@ -62,22 +62,22 @@ class DebugResetCommand implements DebugReset
         $game->finished_at = new DateTime('now');
         $game->item = $item;
         $game->user = $user;
-        $game->money = 10000;
-        $game->bonus = 10000;
+        $game->money = 100000;
+        $game->bonus = 100000;
         $game->processed = false;
         $db::store($game);
         $user->current_game = $game;
         $db::store($user);
         $user->current_game = null;
         $db::store($user);
-        $db::trash('game');
+        $db::exec('DELETE FROM game'); // $db::trash('game');
 
         // Bank
 
         $bank = $db::dispense([
             '_type' => 'bank',
-            'total' => 10000,
-            'hold' => 10000,
+            'total' => 100000,
+            'hold' => 100000,
         ]);
         $db::store($bank);
         $bank['hold'] = 0;

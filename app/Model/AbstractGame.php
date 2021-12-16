@@ -28,6 +28,11 @@ abstract class AbstractGame implements Game
         }
     }
 
+    function getId(): int
+    {
+        return $this->bean['id'];
+    }
+
     public function forPlayer(User $user): static
     {
         $this->bean['user_id'] = $user->getId();
@@ -56,7 +61,7 @@ abstract class AbstractGame implements Game
     {
         Services::getDB()::exec(
             'UPDATE user SET current_game_id = null WHERE id = ?;
-                UPDATE game SET finished_at = CURRENT_TIMESTAMP()',
+                UPDATE game SET finished_at = CURRENT_TIMESTAMP() WHERE id = ?',
             [$this->bean['user_id'], $this->bean['id']]);
     }
 
@@ -69,5 +74,4 @@ abstract class AbstractGame implements Game
             [$this->bean['id']]);
         $this->deactivateGame();
     }
-
 }

@@ -5,10 +5,11 @@ namespace App\Model;
 use App\Localize\UITranslator;
 use App\Service\Services;
 use DateTime;
+use Error;
 use RedBeanPHP\Facade;
 use RedBeanPHP\OODBBean;
 
-class GameRepository implements GameCreator
+class GameRepository implements GameCreator, GameLoader
 {
 
     static function createNewRandomPrizeGame(User $player): Game
@@ -83,4 +84,18 @@ class GameRepository implements GameCreator
         }
     }
 
+    static function loadGame(int $gameId): Game
+    {
+        $db = Services::getDB();
+        $bean = $db::load('game', $gameId);
+        if ($bean['bonus']) {
+            return new BonusPrize(null, $gameId);
+        } else if ($bean['money']) {
+            return new MoneyPrize(null, $gameId);
+        } else if ($bean['item_id']) {
+            return new ItemPrize(null, $gameId);
+        } else {
+            return new DeclinedPrize($gameId);
+        }
+    }
 }

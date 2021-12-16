@@ -10,10 +10,10 @@ class ItemPrize extends AbstractGame implements Game
 
     public function __construct(
         private ?Item $item,
-        ?int $id = null,
+        ?int          $gameId = null,
     )
     {
-        parent::__construct($id);
+        parent::__construct($gameId);
         if ($item) {
             $this->bean['item_id'] = $item->getId();
         } else if ($this->bean['item_id']) {

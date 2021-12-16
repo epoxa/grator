@@ -7,13 +7,16 @@ use App\Service\Services;
 class UserModel implements User
 {
 
-    private ?string $username = null;
+    private string $username;
     private ?int $currentGameId = null;
 
     public function __construct(
-        private ?int $id = null,
+        private int $id,
     )
     {
+        $bean = Services::getDB()::load('user', $this->id);
+        $this->username = $bean['username'];
+        $this->currentGameId = $bean['current_game_id'];
     }
 
     function getId(): ?int
@@ -26,15 +29,12 @@ class UserModel implements User
         return $this->username;
     }
 
-    function authorize(string $userName, string $password): ?User
+    static function authorize(string $userName, string $password): ?User
     {
         $bean = Services::getDB()::findOne('user', 'username = ?', [$userName]);
         if (!$bean) return null;
         if (!password_verify($password, $bean['password'])) return null;
-        $this->id = $bean['id'];
-        $this->currentGameId = $bean['current_game_id'];
-        $this->username = $userName;
-        return $this;
+        return new static($bean['id']);
     }
 
     function getCurrentGame(): ?Game
@@ -42,6 +42,13 @@ class UserModel implements User
         $db = Services::getDB();
         $game = $db::findOne('game', 'id = ?', [$this->currentGameId]);
         if (!$game) return null;
-//        return new GameModel()
+        return GameRepository::loadGame($game['id']);
+    }
+
+    function setCurrentGame(?Game $game): void
+    {
+        $gameId = $game?->getId();
+        $this->currentGameId = $gameId;
+        Services::getDB()::exec("UPDATE user SET current_game_id = ? WHERE id = ?", [$gameId, $this->id]);
     }
 }

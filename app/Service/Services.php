@@ -19,6 +19,8 @@ class Services implements ServiceLocator
     {
         return [
             'APP_NAME' => static::APP_NAME,
+            'APP_ROOT' => realpath(__DIR__ . "/.."),
+            'WEB_ROOT' => realpath(__DIR__ . "/../../web"),
             'MONEY_PRIZE' => [
                 'MIN' => 1000,
                 'MAX' => 10000,
@@ -28,7 +30,7 @@ class Services implements ServiceLocator
                 'MAX' => 10000,
                 'COEFFICIENT' => 300,
             ],
-            'DEBUG' => false,
+            'DEBUG' => true,
         ];
     }
 
@@ -53,9 +55,9 @@ class Services implements ServiceLocator
             $dbUser = getenv('DB_USERNAME');
             $dbPassword = getenv('DB_PASSWORD');
             $dsn = "mysql:host=$dbHost;dbname=$dbName";
-            static::getLog()->log(Logger::DEBUG, $dsn);
-            $pdo = new \PDO($dsn,$dbUser,$dbPassword);
-            $pdo->query('show tables');
+//            static::getLog()->log(Logger::DEBUG, $dsn . " USER: $dbUser PASSWD: $dbPassword");
+//            $pdo = new \PDO($dsn,$dbUser,$dbPassword);
+//            $pdo->query('show tables');
             static::$db::setup($dsn, $dbUser, $dbPassword, !static::getConfig()['DEBUG']);
 //            static::$db::fancyDebug(true);
         }

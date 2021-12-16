@@ -17,7 +17,7 @@ class SimpleAuthorizationHttpHandler implements HttpHandler
         }
         $user = $this->authorize($request);
         if ($user) {
-            return (new UserAuthorizedHttpHandler($user))
+            return (new ApiDispatcher($user))
                 ->handle($request, $defaultResponse);
         } else {
             return $this->askForCredentials($defaultResponse);
@@ -36,7 +36,7 @@ class SimpleAuthorizationHttpHandler implements HttpHandler
         $auth = $authHeaders[0];
         if (!preg_match('/^Basic\s+(.+)$/',$auth,$matches)) return null;
         list($userName, $password) = explode(':', base64_decode($matches[1]));
-        return (new UserModel())->authorize($userName, $password);
+        return UserModel::authorize($userName, $password);
     }
 
 

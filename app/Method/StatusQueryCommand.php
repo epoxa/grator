@@ -6,6 +6,7 @@ use App\Localize\BonusPrizeDisplayTextComposer;
 use App\Localize\GameWelcomeDisplayTextComposer;
 use App\Localize\ItemPrizeDisplayTextComposer;
 use App\Localize\MoneyPrizeDisplayTextComposer;
+use App\Localize\UITranslator;
 use App\Localize\UserCommandDisplayTextComposer;
 use App\Model\Offer;
 use App\Model\OfferModel;
@@ -16,11 +17,7 @@ use App\Service\Services;
 class StatusQueryCommand implements StatusQuery
 {
     function __construct(
-        private GameWelcomeDisplayTextComposer $welcomeComposer,
-        private MoneyPrizeDisplayTextComposer $moneyComposer,
-        private BonusPrizeDisplayTextComposer $bonusComposer,
-        private ItemPrizeDisplayTextComposer $itemComposer,
-        private UserCommandDisplayTextComposer $commandComposer,
+        private UITranslator $translator,
     )
     {
     }
@@ -30,11 +27,15 @@ class StatusQueryCommand implements StatusQuery
         $db = Services::getDB();
         $game = $user->getCurrentGame();
         if ($game) {
-
-        } else {
-//            $db::getCell('SELECT SUM(`count`) FROM item, ')
             return new OfferModel(
-                $this->welcomeComposer->composeWelcomeText(100,100),
+                $game->getOfferText($this->translator),
+                $game->getAvailableCommands()
+            );
+        } else {
+            $itemsCount = $db::getCell('SELECT SUM(`count` - hold) FROM item');
+            $moneyAmount = $db::getCell('SELECT total - hold FROM bank');
+            return new OfferModel(
+                $this->translator->composeWelcomeText($moneyAmount, $itemsCount),
                 [
                     new StartGameCommand(),
                 ]

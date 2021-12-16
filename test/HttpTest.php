@@ -60,4 +60,31 @@ final class HttpTest extends TestCase{
         $this->assertEquals(401, $response->getStatusCode());
     }
 
+    /**
+     * @covers SimpleAuthorizationHttpHandler::authorize
+     */
+    public function testHttpLogin(): void
+    {
+        $request = new ServerRequest('GET', '/');
+        $request = $request->withHeader('Authorization', 'Basic ' . base64_encode('Vadim:3'));
+        $defaultResponse = new Response();
+        $handler = new SimpleAuthorizationHttpHandler();
+        $response = $handler->handle($request,$defaultResponse);
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    /**
+     * @covers SimpleAuthorizationHttpHandler::authorize
+     */
+    public function testHttpStart(): void
+    {
+        $request = new ServerRequest('POST', '/start');
+        $request = $request->withHeader('Authorization', 'Basic ' . base64_encode('Vadim:3'));
+        $request = $request->withHeader('Accept', 'application/json');
+        $defaultResponse = new Response();
+        $handler = new SimpleAuthorizationHttpHandler();
+        $response = $handler->handle($request,$defaultResponse);
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
 }

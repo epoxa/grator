@@ -13,11 +13,15 @@ class MoneyPrize extends AbstractGame implements Game, ReplaceablePrize
 
     public function __construct(
         private ?int $money,
-        ?int $id = null,
+        ?int         $gameId = null,
     )
     {
-        parent::__construct($id);
-        $this->bean['money'] = $this->money;
+        parent::__construct($gameId);
+        if ($this->money) {
+            $this->bean['money'] = $this->money;
+        } else {
+            $this->money = $this->bean['money'];
+        }
     }
 
     function getOfferText(UITranslator $translator): string
@@ -42,7 +46,7 @@ class MoneyPrize extends AbstractGame implements Game, ReplaceablePrize
 
     function decline(): void
     {
-        Services::getDB()::exec('UPDATE item SET hold = hold - ?', [$this->money]);
+        Services::getDB()::exec('UPDATE bank SET hold = hold - ?', [$this->money]);
         parent::decline();
     }
 

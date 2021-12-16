@@ -5,6 +5,7 @@
 
 :80 {
     root * /srv/web
+    file_server
     php_fastcgi php:9000 {
     }
 }

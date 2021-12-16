@@ -9,16 +9,35 @@ use App\Localize\MoneyPrizeDisplayTextComposer;
 use App\Localize\UITranslator;
 use App\Localize\UserCommandDisplayTextComposer;
 use App\Model\Item;
+use App\Model\User;
 use App\Service\Services;
 
 class WebTranslator implements
     UITranslator
 {
 
+    public function __construct(
+        private User $user
+    )
+    {
+    }
+
     function composeWelcomeText(int $moneyBankFund, int $itemsTotalCount): string
     {
-        return "Welcome to the game! Start game to win one of the <em class='count'>$itemsTotalCount</em> items,"
-            . " money from <em class='money'>$moneyBankFund $</em> fund, or unlimited slotebonuses!";
+        $userName = $this->user->getUsername();
+        $text = "Welcome to the game, $userName!<br> Start game to win ";
+        if ($itemsTotalCount) {
+            $text .= "one of the <em class='count'>$itemsTotalCount</em> items, ";
+        }
+        if ($moneyBankFund > Services::getConfig()['MONEY_PRIZE']['MIN']) {
+            $money = ceil($moneyBankFund / 100);
+            $text .= "money from <em class='money'>$money $</em> fund, ";
+        }
+        if ($itemsTotalCount || $moneyBankFund) {
+            $text .= "or ";
+        }
+        $text .= "unlimited slotebonuses!";
+        return $text;
     }
 
     function composeMoneyText(int $money): string

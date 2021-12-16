@@ -2,7 +2,8 @@ version: "3.4"
 
 services:
   php:
-    image: 'php:8.0-fpm-alpine'
+    build:
+      context: .
     depends_on:
       - db
     restart: unless-stopped
@@ -38,15 +39,15 @@ services:
     ports:
       # HTTP
       - target: 80
-        published: 80
+        published: 8880
         protocol: tcp
       # HTTPS
       - target: 443
-        published: 443
+        published: 8443
         protocol: tcp
       # HTTP/3
       - target: 443
-        published: 443
+        published: 8443
         protocol: udp
 
   db:
@@ -61,7 +62,7 @@ services:
       MYSQL_PASSWORD: '${DB_PASSWORD}'
       MYSQL_ALLOW_EMPTY_PASSWORD: 1
     volumes:
-      - 'db_data:/var/lib/mysql'
+      - './db_data:/docker-entrypoint-initdb.d'
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-p${DB_PASSWORD}"]
       retries: 3

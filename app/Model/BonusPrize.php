@@ -9,11 +9,15 @@ class BonusPrize extends AbstractGame implements Game
 
     public function __construct(
         private ?int $bonus,
-        ?int         $id = null,
+        ?int         $gameId = null,
     )
     {
-        parent::__construct($id);
-        $this->bean['bonus'] = $this->bonus;
+        parent::__construct($gameId);
+        if ($this->bonus) {
+            $this->bean['bonus'] = $this->bonus;
+        } else {
+            $this->bonus = $this->bean['bonus'];
+        }
     }
 
     function getOfferText(UITranslator $translator): string

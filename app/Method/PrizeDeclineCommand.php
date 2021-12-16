@@ -12,8 +12,14 @@ class PrizeDeclineCommand  implements UserCommand
         return 'decline';
     }
 
+    /**
+     * @throws InvalidStateException
+     */
     function execute(User $user): void
     {
-        //
+        $game = $user->getCurrentGame();
+        if (!$game) throw new InvalidStateException('Game not started');
+        $game->decline();
+        $user->setCurrentGame(null);
     }
 }
