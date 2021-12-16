@@ -12,8 +12,11 @@ There are three demo users available:
 ## Setup
 git clone https://github.com/epoxa/grator && cd grator && ./boot.sh
 
+## CLI interface local demo
+./play.sh
+
 ## Local web demo
-After booting docker-compose images point your browser to http://localhost:8880.
+Point your browser to http://localhost:8880.
 
 There are three demo users available:
 * Adel (password: 1)
