@@ -18,6 +18,7 @@ ajax.onloadend = function () {
         }
         commands.insertBefore(btn, null);
     });
+    if (json['message']) alert(json['message']);
 }
 
 ajax.open('GET', '/', true);

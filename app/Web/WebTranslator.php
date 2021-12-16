@@ -12,8 +12,7 @@ use App\Model\Item;
 use App\Model\User;
 use App\Service\Services;
 
-class WebTranslator implements
-    UITranslator
+class WebTranslator implements UITranslator
 {
 
     public function __construct(
@@ -79,4 +78,20 @@ class WebTranslator implements
         return static::COMMAND_WEB_NAMES[$commandName] ?? $commandName; // Just in case
     }
 
+    function composeItemSendText(Item $item): string
+    {
+        $itemName = $item->getName();
+        return "$itemName will be sent to you in the mail as soon as possible!";
+    }
+
+    function composeMoneyPayText(int $money): string
+    {
+        $formatted = number_format($money / 100, 2, '.', '');
+        return "$formatted $ will be transferred to you credit card soon";
+    }
+
+    function composeBonusAcceptedText(int $bonus): string
+    {
+        return "You got $bonus slotebonuses";
+    }
 }

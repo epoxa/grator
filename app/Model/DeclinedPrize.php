@@ -22,7 +22,7 @@ class DeclinedPrize extends AbstractGame implements Game
     /**
      * @throws InvalidStateException
      */
-    function accept(): void
+    function accept(UITranslator $translator): string
     {
         throw new InvalidStateException('Game declined');
     }

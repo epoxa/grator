@@ -65,8 +65,6 @@ abstract class AbstractGame implements Game
             [$this->bean['user_id'], $this->bean['id']]);
     }
 
-    abstract function accept(): void;
-
     function decline(): void
     {
         Services::getDB()::exec(

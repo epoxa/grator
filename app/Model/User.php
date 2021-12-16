@@ -9,4 +9,6 @@ interface User
     function getUsername(): ?string;
     function getCurrentGame(): ?Game;
     function setCurrentGame(?Game $game): void;
+    function sendMessage(string $message);
+    function popCurrentMessage(): ?string;
 }

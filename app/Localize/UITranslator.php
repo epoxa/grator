@@ -7,6 +7,9 @@ interface UITranslator extends
     BonusPrizeDisplayTextComposer,
     MoneyPrizeDisplayTextComposer,
     ItemPrizeDisplayTextComposer,
-    UserCommandDisplayTextComposer
+    UserCommandDisplayTextComposer,
+    MoneyAcceptedDisplayTextComposer,
+    ItemPrizeAcceptedDisplayTextComposer,
+    BonusPrizeAcceptedDisplayTextComposer
 {
 }

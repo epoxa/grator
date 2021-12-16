@@ -78,6 +78,9 @@ class UserApiHandler implements HttpHandler
                 'caption' => $webTranslator->composeCommandCaption($commandName),
             ];
         }
+        if ($message = $this->loggedInUser->popCurrentMessage()) {
+            $status['message'] = $message;
+        }
         return $status;
     }
 

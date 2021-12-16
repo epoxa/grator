@@ -9,6 +9,7 @@ class UserModel implements User
 
     private string $username;
     private ?int $currentGameId = null;
+    private ?string $message = null;
 
     public function __construct(
         private int $id,
@@ -50,5 +51,17 @@ class UserModel implements User
         $gameId = $game?->getId();
         $this->currentGameId = $gameId;
         Services::getDB()::exec("UPDATE user SET current_game_id = ? WHERE id = ?", [$gameId, $this->id]);
+    }
+
+    function sendMessage(string $message)
+    {
+        $this->message = $message;
+    }
+
+    function popCurrentMessage(): ?string
+    {
+        $message = $this->message;
+        $this->message = null;
+        return $message;
     }
 }

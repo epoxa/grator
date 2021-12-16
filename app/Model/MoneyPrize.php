@@ -38,10 +38,11 @@ class MoneyPrize extends AbstractGame implements Game, ReplaceablePrize
         ];
     }
 
-    function accept(): void
+    function accept(UITranslator $translator): string
     {
         Services::getDB()::exec('UPDATE bank SET total = total - ?, hold = hold - ?', [$this->money, $this->money]);
         $this->deactivateGame();
+        return $translator->composeMoneyPayText($this->money);
     }
 
     function decline(): void
@@ -50,11 +51,12 @@ class MoneyPrize extends AbstractGame implements Game, ReplaceablePrize
         parent::decline();
     }
 
-    function replaceToBonus(): void
+    function replaceToBonus(UITranslator $translator): string
     {
         $bonus = $this->money * Services::getConfig()['BONUS_PRIZE']['COEFFICIENT'];
         Services::getDB()::exec('UPDATE game SET money = null, bonus = ? WHERE id = ?', [$bonus, $this->bean['id']]);
         Services::getDB()::exec('UPDATE bank SET hold = hold - ?', [$this->money]);
         $this->deactivateGame();
+        return $translator->composeBonusAcceptedText($bonus);
     }
 }

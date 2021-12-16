@@ -26,10 +26,11 @@ class ItemPrize extends AbstractGame implements Game
         return $translator->composeItemText($this->item);
     }
 
-    function accept(): void
+    function accept(UITranslator $translator): string
     {
         Services::getDB()::exec('UPDATE item SET count = count - 1, hold = hold - 1 WHERE id = ?', [$this->bean['item_id']]);
         $this->deactivateGame();
+        return $translator->composeItemSendText($this->item);
     }
 
     function decline(): void

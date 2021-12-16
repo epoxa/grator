@@ -25,8 +25,9 @@ class BonusPrize extends AbstractGame implements Game
         return $translator->composeBonusText($this->bonus);
     }
 
-    function accept(): void
+    function accept(UITranslator $translator): string
     {
         parent::deactivateGame();
+        return $translator->composeBonusAcceptedText($this->bonus);
     }
 }
