@@ -39,8 +39,6 @@ abstract class AbstractGame implements Game
         return $this;
     }
 
-    abstract function getOfferText(UITranslator $translator): string;
-
     function getAvailableCommands(): iterable
     {
         return [

@@ -16,13 +16,13 @@ class GameRepository implements GameCreator, GameLoader
     {
         $db = Services::getDB();
         return $db::transaction(function () use($db, $player) {
-            $newGame = static::setupPrize($db, Services::getConfig())->forPlayer($player);
+            $newGame = static::setupPrize(Services::getConfig(), $db)->forPlayer($player);
             $newGame->store();
             return $newGame;
         });
     }
 
-    static private function setupPrize(Facade $db, array $config): AbstractGame
+    static private function setupPrize(array $config, Facade $db): AbstractGame
     {
         // Bonus prize is always possible
 

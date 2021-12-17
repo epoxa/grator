@@ -49,16 +49,18 @@ class UserApiHandler implements HttpHandler
 
     private function processRequest(ServerRequestInterface $request): array
     {
-        $method = $request->getMethod();
+        $httpMethod = $request->getMethod();
         $path = $request->getUri()->getPath();
-        Services::getLog()->debug("$method $path");
-        if ($method === 'GET' && $path === '/') {
+        Services::getLog()->debug("$httpMethod $path");
+        if ($httpMethod === 'GET' && $path === '/') {
             return $this->queryStatus();
-        } else if ($method === 'POST') {
+        } else if ($httpMethod === 'POST') {
             $command = $this->methodsMap[$path] ?? null;
-            if ($command) return $command();
+            if (!$command) return [];
+            $command();
+            return $this->queryStatus();
         };
-        return [];
+        return []; // 404
     }
 
     private function queryStatus(): array
@@ -84,43 +86,38 @@ class UserApiHandler implements HttpHandler
         return $status;
     }
 
-    private function startGame(): array
+    private function startGame(): void
     {
         (new StartGameCommand())->execute($this->loggedInUser);
-        return $this->queryStatus();
     }
 
     /**
      * @throws InvalidStateException
      */
-    private function acceptPrize(): array
+    private function acceptPrize(): void
     {
         (new PrizeAcceptCommand())->execute($this->loggedInUser);
-        return $this->queryStatus();
     }
 
-    private function replacePrize(): array
+    private function replacePrize(): void
     {
         (new PrizeReplaceBonusesCommand())->execute($this->loggedInUser);
-        return $this->queryStatus();
     }
 
     /**
      * @throws InvalidStateException
      */
-    private function declinePrize(): array
+    private function declinePrize(): void
     {
         (new PrizeDeclineCommand())->execute($this->loggedInUser);
-        return $this->queryStatus();
     }
 
     /**
      * @throws SQL
      */
-    private function debugResetGame(): array
+    private function debugResetGame(): void
     {
         (new DebugResetCommand())->execute();
-        return $this->queryStatus();
     }
 
     private function answerWithJson($result, ResponseInterface $defaultResponse): ResponseInterface

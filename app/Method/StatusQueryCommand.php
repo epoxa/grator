@@ -8,6 +8,7 @@ use App\Localize\ItemPrizeDisplayTextComposer;
 use App\Localize\MoneyPrizeDisplayTextComposer;
 use App\Localize\UITranslator;
 use App\Localize\UserCommandDisplayTextComposer;
+use App\Model\Game;
 use App\Model\Offer;
 use App\Model\OfferModel;
 use App\Model\User;
@@ -24,22 +25,32 @@ class StatusQueryCommand implements StatusQuery
 
     function get(User $user): Offer
     {
-        $db = Services::getDB();
         $game = $user->getCurrentGame();
         if ($game) {
-            return new OfferModel(
-                $game->getOfferText($this->translator),
-                $game->getAvailableCommands()
-            );
+            return $this->createGameOffer($game);
         } else {
-            $itemsCount = $db::getCell('SELECT SUM(`count` - hold) FROM item');
-            $moneyAmount = $db::getCell('SELECT total - hold FROM bank');
-            return new OfferModel(
-                $this->translator->composeWelcomeText($moneyAmount, $itemsCount),
-                [
-                    new StartGameCommand(),
-                ]
-            );
+            return $this->createStartOffer();
         }
+    }
+
+    private function createStartOffer(): OfferModel
+    {
+        $db = Services::getDB();
+        $itemsCount = $db::getCell('SELECT SUM(`count` - hold) FROM item');
+        $moneyAmount = $db::getCell('SELECT total - hold FROM bank');
+        return new OfferModel(
+            $this->translator->composeWelcomeText($moneyAmount, $itemsCount),
+            [
+                new StartGameCommand(),
+            ]
+        );
+    }
+
+    private function createGameOffer(Game $game): OfferModel
+    {
+        return new OfferModel(
+            $game->getOfferText($this->translator),
+            $game->getAvailableCommands()
+        );
     }
 }

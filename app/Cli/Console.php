@@ -29,6 +29,15 @@ class Console
         return rtrim(shell_exec($command));
     }
 
+    public static function readChar(): string
+    {
+        $term = shell_exec("stty -g");
+        system("stty -icanon");
+        $char = fgetc(STDIN);
+        system("stty $term");
+        return $char;
+    }
+
     public static function space(): void
     {
         static::write("\n");
@@ -42,6 +51,7 @@ class Console
 
     public static function exitConsole($buyMessage): void
     {
+        static::space();
         die("$buyMessage\n\n");
     }
 

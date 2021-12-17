@@ -10,6 +10,7 @@ use App\Method\PrizeReplaceBonusesCommand;
 use App\Method\StartGameCommand;
 use App\Method\StatusQueryCommand;
 use App\Method\UserCommand;
+use App\Model\Offer;
 use App\Model\User;
 use RedBeanPHP\RedException\SQL;
 
@@ -36,7 +37,7 @@ class ConsoleUI implements UI
         $this->loggedInUser = CliAuthenticator::authenticate();
         $this->showOffer();
         do  {
-            $key = static::askForCommand();
+            $key = Console::readChar();
             $this->processKeyCommand($key);
             $this->showOffer();
         } while (true);
@@ -45,38 +46,22 @@ class ConsoleUI implements UI
     private function showOffer()
     {
         Console::clean();
-        if ($message = $this->loggedInUser->popCurrentMessage()) {
-            Console::alert($message);
-            Console::space();
-        }
+        $this->displayMessage();
         $translator = new CliTranslator($this->loggedInUser);
         $statusQueryCommand = new StatusQueryCommand($translator);
         $offer = $statusQueryCommand->get($this->loggedInUser);
-        Console::write($offer->getText());
-        Console::space();
-        $buttons = '';
-        foreach ($offer->getMethods() as $command) {
-            /** @var UserCommand $command */
-            $commandName = $command->getCommandName();
-            $caption = $translator->composeCommandCaption($commandName);
-            $buttons .= " [ $caption ]";
-        }
-        $resetCommandCaption = $translator->composeCommandCaption('reset');
-        $exitCommandCaption = $translator->composeCommandCaption('exit');
-        $buttons .= " [ $resetCommandCaption ]";
-        $buttons .= " [ $exitCommandCaption ]";
-        Console::out($buttons);
-    }
-
-    private function askForCommand(): string
-    {
-        return Console::askForInput(null);
+        $this->displayOfferText($offer);
+        $this->displayCommands($offer, $translator);
     }
 
     private function processKeyCommand($key)
     {
         $method = $this->methodsMap[$key] ?? null;
-        $method();
+        if ($method) try {
+            $method();
+        } catch(InvalidStateException) {
+            // Do nothing
+        }
     }
 
     private function startGame(): void
@@ -92,6 +77,9 @@ class ConsoleUI implements UI
         (new PrizeAcceptCommand())->execute($this->loggedInUser);
     }
 
+    /**
+     * @throws InvalidStateException
+     */
     private function replacePrize(): void
     {
         (new PrizeReplaceBonusesCommand())->execute($this->loggedInUser);
@@ -110,13 +98,46 @@ class ConsoleUI implements UI
      */
     private function debugResetGame(): void
     {
+        Console::space();
         if (Console::askForInput("Really restart? [y/N]") !== 'y') return;
         (new DebugResetCommand())->execute();
     }
 
     private function exitGame(): void
     {
-        Console::exitConsole("Buy buy...");
+        $username = $this->loggedInUser->getUsername();
+        Console::exitConsole("Buy buy, $username...");
+    }
+
+    private function displayMessage(): void
+    {
+        if ($message = $this->loggedInUser->popCurrentMessage()) {
+            Console::alert($message);
+            Console::space();
+        }
+    }
+
+    private function displayOfferText(Offer $offer): void
+    {
+        Console::write($offer->getText());
+        Console::space();
+    }
+
+    private function displayCommands(Offer $offer, CliTranslator $translator): void
+    {
+        $buttons = '';
+        foreach ($offer->getMethods() as $command) {
+            /** @var UserCommand $command */
+            $commandName = $command->getCommandName();
+            $caption = $translator->composeCommandCaption($commandName);
+            $buttons .= " [ $caption ]";
+        }
+        $resetCommandCaption = $translator->composeCommandCaption('reset');
+        $exitCommandCaption = $translator->composeCommandCaption('exit');
+        $buttons .= " [ $resetCommandCaption ]";
+        $buttons .= " [ $exitCommandCaption ]";
+        $buttons .= " ";
+        Console::out($buttons);
     }
 
 
