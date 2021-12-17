@@ -28,11 +28,12 @@ class WebTranslator implements UITranslator
         if ($itemsTotalCount) {
             $text .= "one of the <em class='count'>$itemsTotalCount</em> items, ";
         }
-        if ($moneyBankFund > Services::getConfig()['MONEY_PRIZE']['MIN']) {
+        $weAreStillRich = $moneyBankFund > Services::getConfig()['MONEY_PRIZE']['MIN'];
+        if ($weAreStillRich) {
             $money = ceil($moneyBankFund / 100);
             $text .= "money from <em class='money'>$money $</em> fund, ";
         }
-        if ($itemsTotalCount || $moneyBankFund) {
+        if ($itemsTotalCount || $weAreStillRich) {
             $text .= "or ";
         }
         $text .= "unlimited slotebonuses!";
