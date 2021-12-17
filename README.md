@@ -1,5 +1,5 @@
 # grator
-Test project for slotegrator
+Test project for Slotegrator
 
 ## Live web demo
 Is here https://grator.vvproject.ru
@@ -16,7 +16,7 @@ git clone https://github.com/epoxa/grator && cd grator && ./boot.sh
 ./play.sh
 
 ## Local web demo
-Point your browser to http://localhost:8880.
+http://localhost:8880.
 
 There are three demo users available:
 * Adele (password: 1)
