@@ -13,7 +13,7 @@ class DebugResetCommand implements DebugReset
      * @throws SQL
      * @noinspection PhpUndefinedFieldInspection
      */
-    function execute(): void
+    function execute(): void // Yes extreme BIG method :)
     {
         $db = Services::getDB();
 
@@ -27,7 +27,7 @@ class DebugResetCommand implements DebugReset
         // Users
 
         $sampleUsers = [
-            ['username' => 'Adel', 'password' => '1'],
+            ['username' => 'Adele', 'password' => '1'],
             ['username' => 'Boris', 'password' => '2'],
             ['username' => 'Vadim', 'password' => '3'],
         ];

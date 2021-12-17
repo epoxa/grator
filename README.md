@@ -5,7 +5,7 @@ Test project for slotegrator
 Is here https://grator.vvproject.ru
 
 There are three demo users available:
-* Adel (password: 1)
+* Adele (password: 1)
 * Boris (password: 2)
 * Vadim (password: 3)
 
@@ -19,7 +19,7 @@ git clone https://github.com/epoxa/grator && cd grator && ./boot.sh
 Point your browser to http://localhost:8880.
 
 There are three demo users available:
-* Adel (password: 1)
+* Adele (password: 1)
 * Boris (password: 2)
 * Vadim (password: 3)
 
