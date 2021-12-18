@@ -23,5 +23,6 @@ class PrizeAcceptCommand implements UserCommand
         $message = $game->accept(new WebTranslator($user));
         $user->setCurrentGame(null);
         $user->sendMessage($message);
+        $game->scheduleProcessing();
     }
 }

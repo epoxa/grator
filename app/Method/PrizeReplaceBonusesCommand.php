@@ -25,5 +25,6 @@ class PrizeReplaceBonusesCommand implements UserCommand
         $message = $game->replaceToBonus(new WebTranslator($user));
         $user->setCurrentGame(null);
         $user->sendMessage($message);
+        $game->scheduleProcessing();
     }
 }

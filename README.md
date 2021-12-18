@@ -2,7 +2,7 @@
 Test project for Slotegrator
 
 ## Live web demo
-Is here https://grator.vvproject.ru
+https://grator.vvproject.ru
 
 There are three demo users available:
 * Adele (password: 1)
@@ -13,7 +13,14 @@ There are three demo users available:
 git clone https://github.com/epoxa/grator && cd grator && ./boot.sh
 
 ## CLI interface local demo
-./play.sh
+**./play.sh** *(play game)*
+
+There are three demo users available:
+* Adele (password: 1)
+* Boris (password: 2)
+* Vadim (password: 3)
+
+**./process.sh** *(send money to winners)*
 
 ## Local web demo
 http://localhost:8880.
@@ -24,4 +31,7 @@ There are three demo users available:
 * Vadim (password: 3)
 
 ## Tests
-./test.sh
+**./test.sh**
+
+## Benchmark
+**./bench.sh**

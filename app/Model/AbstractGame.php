@@ -2,7 +2,6 @@
 
 namespace App\Model;
 
-use App\Localize\UITranslator;
 use App\Method\PrizeAcceptCommand;
 use App\Method\PrizeDeclineCommand;
 use App\Service\Services;
@@ -13,6 +12,7 @@ use RedBeanPHP\RedException\SQL;
 abstract class AbstractGame implements Game
 {
     protected OODBBean $bean;
+    protected ?User $user = null;
 
     public function __construct(
         ?int $id = null,
@@ -24,13 +24,20 @@ abstract class AbstractGame implements Game
         } else {
             $this->bean = $db::dispense('game');
             $this->bean['created_at'] = new DateTime();
-            $this->bean['processed'] = false;
         }
     }
 
     function getId(): int
     {
         return $this->bean['id'];
+    }
+
+    function getUser(): User
+    {
+        if (!$this->user) {
+            $this->user = new UserModel($this->bean['user_id']);
+        }
+        return $this->user;
     }
 
     public function forPlayer(User $user): static
@@ -60,14 +67,27 @@ abstract class AbstractGame implements Game
         Services::getDB()::exec(
             'UPDATE user SET current_game_id = null WHERE id = ?;
                 UPDATE game SET finished_at = CURRENT_TIMESTAMP() WHERE id = ?',
-            [$this->bean['user_id'], $this->bean['id']]);
+            [$this->bean['user_id'], $this->getId()]);
     }
 
     function decline(): void
     {
         Services::getDB()::exec(
             'UPDATE game SET money = null, bonus = null, item_id = null WHERE id = ?',
-            [$this->bean['id']]);
+            [$this->getId()]);
         $this->deactivateGame();
+    }
+
+    function scheduleProcessing()
+    {
+        $gameId = $this->getId();
+        $processorPath = Services::getConfig()['APP_ROOT'] . "/console/process.php";
+        exec("php $processorPath $gameId", $output, $ret);
+    }
+
+
+    function markProcessed()
+    {
+        Services::getDB()::exec('UPDATE game SET processed_at = ? WHERE id = ?', [new DateTime(), $this->getId()]);
     }
 }

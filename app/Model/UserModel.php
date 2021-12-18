@@ -30,6 +30,17 @@ class UserModel implements User
         return $this->username;
     }
 
+    function getCardNumber(): string
+    {
+        return md5($this->getUsername()); // Just a stub
+    }
+
+    function getPostAddress(): string
+    {
+        $userName = $this->getUsername();
+        return "Dummy $userName address";
+    }
+
     static function authorize(string $userName, string $password): ?User
     {
         $bean = Services::getDB()::findOne('user', 'username = ?', [$userName]);

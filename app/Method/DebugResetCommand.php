@@ -60,11 +60,11 @@ class DebugResetCommand implements DebugReset
         $game = $db::dispense('game');
         $game->created_at = new DateTime('now');
         $game->finished_at = new DateTime('now');
+        $game->processed_at = new DateTime('now');
         $game->item = $item;
         $game->user = $user;
         $game->money = 100000;
         $game->bonus = 100000;
-        $game->processed = false;
         $db::store($game);
         $user->current_game = $game;
         $db::store($user);

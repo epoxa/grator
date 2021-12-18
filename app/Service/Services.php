@@ -14,6 +14,9 @@ class Services implements ServiceLocator
 
     static private ?LoggerInterface $logger = null;
     static private ?Facade $db = null;
+    static private ?BonusProcessor $bonusProcessor = null;
+    static private ?BankProcessor $bankProcessor = null;
+    static private ?ItemProcessor $itemProcessor = null;
 
     static function getConfig(): array
     {
@@ -30,7 +33,8 @@ class Services implements ServiceLocator
                 'MAX' => 10000,
                 'COEFFICIENT' => 300,
             ],
-            'DEBUG' => true,
+            'MANAGER_EMAIL' => 'dummy@mailinator.com',
+            'DEBUG' => false,
         ];
     }
 
@@ -55,12 +59,33 @@ class Services implements ServiceLocator
             $dbUser = getenv('DB_USERNAME');
             $dbPassword = getenv('DB_PASSWORD');
             $dsn = "mysql:host=$dbHost;dbname=$dbName";
-//            static::getLog()->log(Logger::DEBUG, $dsn . " USER: $dbUser PASSWD: $dbPassword");
-//            $pdo = new \PDO($dsn,$dbUser,$dbPassword);
-//            $pdo->query('show tables');
             static::$db::setup($dsn, $dbUser, $dbPassword, !static::getConfig()['DEBUG']);
 //            static::$db::fancyDebug(true);
         }
         return static::$db;
+    }
+
+    static function getBonusProcessor(): BonusProcessor
+    {
+        if (!self::$bonusProcessor) {
+            self::$bonusProcessor = new DummyBonusProcessor();
+        }
+        return self::$bonusProcessor;
+    }
+
+    static function getBankProcessor(): BankProcessor
+    {
+        if (!self::$bankProcessor) {
+            self::$bankProcessor = new DummyBankProcessor();
+        }
+        return self::$bankProcessor;
+    }
+
+    static function getItemProcessor(): ItemProcessor
+    {
+        if (!self::$itemProcessor) {
+            self::$itemProcessor = new DummyItemProcessor();
+        }
+        return self::$itemProcessor;
     }
 }

@@ -13,4 +13,10 @@ interface ServiceLocator
 
     static function getDB(): Facade;
 
+    static function getBonusProcessor(): BonusProcessor;
+
+    static function getBankProcessor(): BankProcessor;
+
+    static function getItemProcessor(): ItemProcessor;
+
 }

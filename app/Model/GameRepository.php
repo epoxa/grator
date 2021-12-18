@@ -58,7 +58,7 @@ class GameRepository implements GameCreator, GameLoader
     static private function setupRandomBonusPrize(array $config): AbstractGame
     {
         $bonusPrizeAmount = rand($config['BONUS_PRIZE']['MIN'], $config['BONUS_PRIZE']['MAX']);
-        return new BonusPrize($bonusPrizeAmount);
+        return new BonusPrizeModel($bonusPrizeAmount);
     }
 
     static private function setupRandomMoneyPrize(int $freeMoney, array $config, Facade $db): AbstractGame
@@ -66,7 +66,7 @@ class GameRepository implements GameCreator, GameLoader
         $maxMoney = min($freeMoney, $config['MONEY_PRIZE']['MAX']);
         $moneyPrizeAmount = rand($config['MONEY_PRIZE']['MIN'], $maxMoney);
         $db::exec('UPDATE bank SET hold = hold + ?', [$moneyPrizeAmount]);
-        return new MoneyPrize($moneyPrizeAmount);
+        return new MoneyPrizeModel($moneyPrizeAmount);
     }
 
     /** @noinspection PhpInconsistentReturnPointsInspection */
@@ -79,7 +79,7 @@ class GameRepository implements GameCreator, GameLoader
             $accum += $rest;
             if ($accum >= $need) {
                 $db::exec('UPDATE item SET hold = hold + 1 WHERE id = ?', [$itemId]);
-                return new ItemPrize(new ItemModel($itemId));
+                return new ItemPrizeModel(new ItemModel($itemId));
             }
         }
     }
@@ -89,11 +89,11 @@ class GameRepository implements GameCreator, GameLoader
         $db = Services::getDB();
         $bean = $db::load('game', $gameId);
         if ($bean['bonus']) {
-            return new BonusPrize(null, $gameId);
+            return new BonusPrizeModel(null, $gameId);
         } else if ($bean['money']) {
-            return new MoneyPrize(null, $gameId);
+            return new MoneyPrizeModel(null, $gameId);
         } else if ($bean['item_id']) {
-            return new ItemPrize(null, $gameId);
+            return new ItemPrizeModel(null, $gameId);
         } else {
             return new DeclinedPrize($gameId);
         }

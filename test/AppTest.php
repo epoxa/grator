@@ -4,10 +4,12 @@ use App\Method\DebugResetCommand;
 use App\Method\PrizeDeclineCommand;
 use App\Method\StartGameCommand;
 use App\Method\StatusQueryCommand;
-use App\Model\BonusPrize;
+use App\Model\AbstractGame;
+use App\Model\BonusPrizeModel;
+use App\Model\Game;
 use App\Model\GameRepository;
-use App\Model\ItemPrize;
-use App\Model\MoneyPrize;
+use App\Model\ItemPrizeModel;
+use App\Model\MoneyPrizeModel;
 use App\Model\UserModel;
 use App\Service\Services;
 use App\Web\WebTranslator;
@@ -68,7 +70,7 @@ final class AppTest extends TestCase{
     public function testSetupRandomBonusPrize(): void
     {
         $bonus = self::callMethod(GameRepository::class,'setupRandomBonusPrize', [Services::getConfig()]);
-        $this->assertInstanceOf(BonusPrize::class, $bonus);
+        $this->assertInstanceOf(BonusPrizeModel::class, $bonus);
     }
 
     public function testSetupRandomMoneyPrize(): void
@@ -76,7 +78,7 @@ final class AppTest extends TestCase{
         $money = self::callMethod(GameRepository::class,'setupRandomMoneyPrize', [
             Services::getConfig()['MONEY_PRIZE']['MIN'], Services::getConfig(),  Services::getDB()
         ]);
-        $this->assertInstanceOf(MoneyPrize::class, $money);
+        $this->assertInstanceOf(MoneyPrizeModel::class, $money);
         $text = $money->getOfferText(new WebTranslator(new UserModel(self::USER_1)));
         self::assertStringContainsString("<em class='money'>10.00</em>", $text);
     }
@@ -85,7 +87,30 @@ final class AppTest extends TestCase{
     {
         $itemsFree = Services::getDB()::getAssoc('SELECT id, count - hold FROM item WHERE count > hold');
         $bonus = self::callMethod(GameRepository::class,'setupRandomItemPrize', [$itemsFree, Services::getDB()]);
-        $this->assertInstanceOf(ItemPrize::class, $bonus);
+        $this->assertInstanceOf(ItemPrizeModel::class, $bonus);
+    }
+
+    public function testCreateNewRandomPrizeGameInTransaction(): void
+    {
+        $db = Services::getDB();
+        $game = $db::transaction(function () {
+            $user = new UserModel(self::USER_1);
+            return self::callMethod(GameRepository::class,'createNewRandomPrizeGame', [$user]);
+        });
+        $this->assertInstanceOf(Game::class, $game);
+    }
+
+    public function testSetupPrize(): void
+    {
+        $db = Services::getDB();
+        $game = $db::transaction(function () {
+            $game = self::callMethod(GameRepository::class, 'setupPrize', [Services::getConfig(), Services::getDB()]);
+            $user = new UserModel(self::USER_1);
+            $game = $game->forPlayer($user);
+//            $game->store();
+            return $game;
+        });
+        $this->assertInstanceOf(AbstractGame::class, $game);
     }
 
     public function testDeclineCommand(): void
