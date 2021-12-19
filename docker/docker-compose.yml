@@ -18,7 +18,7 @@ services:
       - php_socket:/var/run/php
       - ../:/srv
     tmpfs:
-      - /srv/log
+      - /srv/log:uid=82,gid=82
     healthcheck:
       interval: 10s
       timeout: 3s
