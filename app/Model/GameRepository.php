@@ -9,7 +9,7 @@ use Error;
 use RedBeanPHP\Facade;
 use RedBeanPHP\OODBBean;
 
-class GameRepository implements GameCreator, GameLoader
+class GameRepository implements GameCreator, GameLoader, GameFinder
 {
 
     static function createNewRandomPrizeGame(User $player): Game
@@ -58,6 +58,7 @@ class GameRepository implements GameCreator, GameLoader
     static private function setupRandomBonusPrize(array $config): AbstractGame
     {
         $bonusPrizeAmount = rand($config['BONUS_PRIZE']['MIN'], $config['BONUS_PRIZE']['MAX']);
+        Services::getLog()->info("Bonus: " . $bonusPrizeAmount);
         return new BonusPrizeModel($bonusPrizeAmount);
     }
 
@@ -65,6 +66,7 @@ class GameRepository implements GameCreator, GameLoader
     {
         $maxMoney = min($freeMoney, $config['MONEY_PRIZE']['MAX']);
         $moneyPrizeAmount = rand($config['MONEY_PRIZE']['MIN'], $maxMoney);
+        Services::getLog()->info("Money: " . $moneyPrizeAmount);
         $db::exec('UPDATE bank SET hold = hold + ?', [$moneyPrizeAmount]);
         return new MoneyPrizeModel($moneyPrizeAmount);
     }
@@ -78,8 +80,10 @@ class GameRepository implements GameCreator, GameLoader
         foreach ($availableItems as $itemId => $rest) {
             $accum += $rest;
             if ($accum >= $need) {
+                $itemModel = new ItemModel($itemId);
+                Services::getLog()->info("Item: " . $itemModel->getName());
                 $db::exec('UPDATE item SET hold = hold + 1 WHERE id = ?', [$itemId]);
-                return new ItemPrizeModel(new ItemModel($itemId));
+                return new ItemPrizeModel($itemModel);
             }
         }
     }
@@ -97,5 +101,16 @@ class GameRepository implements GameCreator, GameLoader
         } else {
             return new DeclinedPrize($gameId);
         }
+    }
+
+    static function findUnprocessedGames(int $maxCountLimit): Iterable
+    {
+        $db = Services::getDB();
+        $games = [];
+        $foundBeans = $db->find('game', "finished_at IS NOT NULL AND processed_at IS NULL ORDER BY finished_at LIMIT $maxCountLimit");
+        foreach ($foundBeans as $bean) {
+            $games[] = static::loadGame($bean['id']);
+        }
+        return $games;
     }
 }

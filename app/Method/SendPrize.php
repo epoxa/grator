@@ -6,5 +6,5 @@ use App\Model\Game;
 
 interface SendPrize
 {
-    function send(Game $game);
+    function execute(Game $game);
 }

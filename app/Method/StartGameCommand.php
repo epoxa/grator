@@ -16,6 +16,7 @@ class StartGameCommand implements UserCommand
 
     function execute(User $user): void
     {
+        Services::getLog()->info($user->getUsername() . " starts game");
         $newGame = Services::getDB()::transaction(function () use ($user) {
             $this->checkGameNotStarted($user);
             return GameRepository::createNewRandomPrizeGame($user);

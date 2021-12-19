@@ -15,6 +15,8 @@ class DebugResetCommand implements DebugReset
      */
     function execute(): void // Yes extreme BIG method :)
     {
+        Services::getLog()->notice("All data reset to the default starting state!!!");
+
         $db = Services::getDB();
 
         $this->dropConstraint('user', 'c_fk_user_current_game_id');

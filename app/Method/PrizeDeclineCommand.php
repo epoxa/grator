@@ -3,6 +3,7 @@
 namespace App\Method;
 
 use App\Model\User;
+use App\Service\Services;
 
 class PrizeDeclineCommand  implements UserCommand
 {
@@ -19,6 +20,7 @@ class PrizeDeclineCommand  implements UserCommand
     {
         $game = $user->getCurrentGame();
         if (!$game) throw new InvalidStateException('Game not started');
+        Services::getLog()->info($user->getUsername() . " declines the prize");
         $game->decline();
         $user->setCurrentGame(null);
     }

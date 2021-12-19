@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use Monolog\Handler\StreamHandler;
+use Monolog\Handler\SyslogHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use RedBeanPHP\Facade;
@@ -38,13 +39,15 @@ class Services implements ServiceLocator
         ];
     }
 
+    /** @noinspection PhpPossiblePolymorphicInvocationInspection */
     static function getLog(): LoggerInterface
     {
         if (!static::$logger) {
             static::$logger = new Logger(static::APP_NAME);
+            $uid = getmyuid();
+            static::$logger->pushHandler(new StreamHandler(static::getConfig()['APP_ROOT'] . "/../log/log-$uid.txt", Logger::DEBUG));
             if (php_sapi_name() !== 'cli') {
-                // Breaks phpunit tests
-                static::$logger->pushHandler(new StreamHandler('php://stdout', Logger::DEBUG));
+                static::$logger->pushHandler(new StreamHandler('php://stderr', Logger::INFO));
             }
         }
         return static::$logger;

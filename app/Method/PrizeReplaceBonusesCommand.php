@@ -4,6 +4,7 @@ namespace App\Method;
 
 use App\Model\ReplaceablePrize;
 use App\Model\User;
+use App\Service\Services;
 use App\Web\WebTranslator;
 
 class PrizeReplaceBonusesCommand implements UserCommand
@@ -22,6 +23,7 @@ class PrizeReplaceBonusesCommand implements UserCommand
         $game = $user->getCurrentGame();
         if (!$game) throw new InvalidStateException(InvalidStateException::GAME_NOT_STARTED);
         if (!$game instanceof ReplaceablePrize) throw new InvalidStateException("Can not replace the prize");
+        Services::getLog()->info($user->getUsername() . " prefer bonuses");
         $message = $game->replaceToBonus(new WebTranslator($user));
         $user->setCurrentGame(null);
         $user->sendMessage($message);

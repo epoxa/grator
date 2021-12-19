@@ -72,22 +72,29 @@ abstract class AbstractGame implements Game
 
     function decline(): void
     {
-        Services::getDB()::exec(
-            'UPDATE game SET money = null, bonus = null, item_id = null WHERE id = ?',
-            [$this->getId()]);
         $this->deactivateGame();
+        Services::getDB()::exec('DELETE FROM game WHERE id = ?', [$this->getId()]);
     }
 
     function scheduleProcessing()
     {
+        // TODO: Can be implemented via pcntl_fork
         $gameId = $this->getId();
-        $processorPath = Services::getConfig()['APP_ROOT'] . "/console/process.php";
-        exec("php $processorPath $gameId", $output, $ret);
+        $processorPath = Services::getConfig()['APP_ROOT'] . "/../console/process.php";
+        $command = "php $processorPath $gameId > /dev/null &";
+        Services::getLog()->debug($command);
+        exec($command, $output, $ret);
+        if ($ret) {
+            Services::getLog()->warning("Return code not null", [
+                'code' => $ret,
+                'output' => $output,
+            ]);
+        }
     }
 
 
     function markProcessed()
     {
-        Services::getDB()::exec('UPDATE game SET processed_at = ? WHERE id = ?', [new DateTime(), $this->getId()]);
+        Services::getDB()::exec('UPDATE game SET processed_at = CURRENT_TIMESTAMP() WHERE id = ?', [$this->getId()]);
     }
 }
