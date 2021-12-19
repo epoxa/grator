@@ -26,9 +26,7 @@ class PrizeProcessor
         try {
             return $this->parseAndProcess($gameId);
         } catch (Throwable $e) {
-            $message = $e->getMessage();
-            Services::getLog()->error($message . "\n" . $e->getTraceAsString());
-            Console::write($message);
+            Services::getLog()->error($e->getMessage() . "\n" . $e->getTraceAsString());
             return self::EXIT_CODE_UNEXPECTED_ERROR;
         }
     }

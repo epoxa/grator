@@ -7,7 +7,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 // Parse params
 
 global $argv;
-$param = $argc ? intval($argv[1]) : null;
+$param = $argc > 1 ? intval($argv[1]) : null;
 $gameId = $param > 0 ? $param : null;
 
 // Do work
