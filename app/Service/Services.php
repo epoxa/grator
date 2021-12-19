@@ -3,7 +3,6 @@
 namespace App\Service;
 
 use Monolog\Handler\StreamHandler;
-use Monolog\Handler\SyslogHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use RedBeanPHP\Facade;
@@ -44,8 +43,8 @@ class Services implements ServiceLocator
     {
         if (!static::$logger) {
             static::$logger = new Logger(static::APP_NAME);
-            $uid = getmyuid();
-            static::$logger->pushHandler(new StreamHandler(static::getConfig()['APP_ROOT'] . "/../log/log-$uid.txt", Logger::DEBUG));
+            $osUser = exec('whoami');
+            static::$logger->pushHandler(new StreamHandler(static::getConfig()['APP_ROOT'] . "/../log/log-$osUser.txt", Logger::DEBUG));
             if (php_sapi_name() !== 'cli') {
                 static::$logger->pushHandler(new StreamHandler('php://stderr', Logger::INFO));
             }

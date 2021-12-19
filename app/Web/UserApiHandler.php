@@ -36,7 +36,8 @@ class UserApiHandler implements HttpHandler
     {
         try {
             $result = $this->processRequest($request);
-        } catch (InvalidStateException) {
+        } catch (InvalidStateException $e) {
+            Services::getLog()->warning($e->getMessage());
             return $defaultResponse->withStatus(400, 'Inappropriate command');
         }
         if ($result) {
