@@ -18,7 +18,7 @@ services:
       - php_socket:/var/run/php
       - ../:/srv
     tmpfs:
-      - /srv/log
+      - /srv/log:mode=777
     healthcheck:
       interval: 10s
       timeout: 3s
